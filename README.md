@@ -3,7 +3,7 @@ A web app written in Vanilla js to provide a voting infrastructure for Prakalpa,
 
 # Running
 
-Run a python http server by executing the following command in the root directory.
+Run a python http server by executing the following command in the `/frontend` directory.
 
 ``` python3 -m http.server ```
 
