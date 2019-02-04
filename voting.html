@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <title>Prakalpa 2019</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/rating.css">
+    <script src="assets/js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            fetch("https://private-be7dd-prakalpa2019.apiary-mock.com/teams")
+                .then(function (res) {
+                    console.log(res);
+                    return res.json();
+                })
+                .then(function (res) {
+                    console.log(res);
+                    var teams = res;
+                    // var len = len(arr);
+                    for (var team of teams) {
+                        if( !team.isVerified )
+                            continue;
+                        var h2 = $("<h2></h2>").text(team.name);
+                        var p = $("<p></p>").text(team.description);
+                        var div3 = $("<div></div>", { class: "rate", "data-rate-value": "6" });
+                        div3.attr("data-rate-value", 6);
+                        var br = "<br/>";
+                        var div2 = $("<div></div>", { class: "content" }).append(h2).append(p).append(div3).append(br);
+                        var article = $("<article></article>", { class: "feature left" }).append(div2);
+                        var div1 = $("<div></div>", { class: "inner" }).append(article);
+                        $("<section>", { id: "team", class: "wrapper style3" }).append(div1).insertAfter("#banner");
+
+                        var options = {
+                            max_value: 6,
+                            step_size: 0.5,
+                            initial_value: 0,
+                            cursor: "default",
+                            convert_to_utf8: true
+                        }
+                        $(".rate").rate();
+                        $(".rate").rate(options);
+                        $(".rate").rate("setValue", 0)
+                        $(".rate").on("change", function (ev, data) {
+                            console.log(data.to);
+                        });
+
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+        })
+
+
+    </script>
+
+
+</head>
+
+<body class="landing">
+
+    <!-- Header -->
+    <header id="header" class="alt">
+        <h1><a href="index.html">Prakalpa 2019</a></h1>
+        <a href="#nav">Menu</a>
+    </header>
+
+    <!-- Nav -->
+    <nav id="nav">
+        <ul class="links">
+            <li><a href="voting.html">Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- Banner -->
+    <section id="banner">
+        <!-- <i class="icon fa-diamond"></i> -->
+        <h2 style="font-size:50px">Prakalpa Voting Portal</h2>
+        <p></p>
+        <ul class="actions">
+            <lead>Voting Instructions</lead><br />
+            <lead>TO DO : bullet points </lead>
+        </ul>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <!-- <ul class="icons">
+                <li><a href="#" class="icon fa-facebook">
+                        <span class="label">Facebook</span>
+                    </a></li>
+                <li><a href="#" class="icon fa-twitter">
+                        <span class="label">Twitter</span>
+                    </a></li>
+                <li><a href="#" class="icon fa-instagram">
+                        <span class="label">Instagram</span>
+                    </a></li>
+                <li><a href="#" class="icon fa-linkedin">
+                        <span class="label">LinkedIn</span>
+                    </a></li>
+            </ul> -->
+            <span></span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/rater.js"></script>
+    <script src="assets/js/rater.min.js"></script>
+
+</body>
+
+</html>

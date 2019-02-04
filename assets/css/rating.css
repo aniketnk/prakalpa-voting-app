@@ -1,0 +1,12 @@
+.rate {
+    font-size: 40px;
+    font-family: sans-serif;
+}
+
+.rate-base-layer {
+    color: rgb(114, 114, 114)
+}
+
+.rate-hover-layer {
+    color: rgb(114, 114, 114)
+}
