@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <title>Prakalpa 2019</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <script src="assets/js/jquery.min.js"></script>
+    <script type="module">
+        import * as config from "./assets/js/config.js";
+        $(document).ready(function () {
+            fetch(config.getApiPath() + "/stats?token=" + sessionStorage.getItem("token"))
+                .then((res) => {
+                    return res.json();
+                })
+                .then((res) => {
+                    let data = Object.entries(res);
+                    console.log(data);
+                    var sorted = data.sort((a, b) => {
+                        return a[1].length < b[1].length;
+                    })
+                    data = sorted;
+                    var lineArray = [];
+                    data.forEach((infoArray, index) => {
+                        let len = infoArray[1].length;
+                        let line = [infoArray[0], len].join(',');
+                        lineArray.push(line);
+                        console.log(len);
+                        var d1 = $("<td></td>").text(infoArray[0]);
+                        // var d2 = $("<td></td>").text(usns);
+                        var d3 = $("<td></td>").text(len);
+                        var row = $("<tr></tr>", { rowspan: len });
+                        row.append(d1);
+                        // row.append(d2);
+                        row.append(d3);
+                        $("#tb").append(row);
+                    });
+                    let csvContent = "data:text/csv;charset=utf-8," + lineArray.join("\n");
+                    var encodedUri = encodeURI(csvContent);
+                    var link = $("<a></a>", { class: "button", href: encodedUri, download: "votings.csv" }).text("Click to Download").append($("<p></p>"));
+                    $("#one").prepend(link);
+                    return;
+                });
+        })
+    </script>
+</head>
+
+<body class="landing">
+
+    <!-- Header -->
+    <header id="header" class="alt">
+        <h1><a href="index.html">Prakalpa 2019</a></h1>
+        <a href="#nav">Menu</a>
+    </header>
+
+    <!-- Nav -->
+    <nav id="nav">
+        <ul class="links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html">Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- Banner -->
+    <section id="banner">
+        <!-- <i class="icon fa-diamond"></i> -->
+        <h2 style="font-size:50px">Prakapla Voting Portal</h2>
+    </section>
+    <section id="one" class="wrapper special style3">
+        <p></p>
+        <div class="inner">
+            <article class="feature left">
+                <table id="stats">
+                    <tbody id="tb">
+                        <tr>
+                            <td>Team Name</td>
+                            <!-- <td>Votes</td> -->
+                            <td>Vote Count</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+        </div>
+    </section>
+
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

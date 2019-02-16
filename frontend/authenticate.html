@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="module">
+        import * as config from "./assets/js/config.js";
+        const returnedUrl = new URL(window.location.href + "");
+        var sig = returnedUrl.searchParams.get("sig") + "";
+        var sso = returnedUrl.searchParams.get("sso") + "";
+        fetch(config.getApiPath() + '/signin', {
+            method: 'POST',
+            mode: "cors",
+            headers: new Headers(),
+            body: JSON.stringify({ sso, sig })
+        })
+            .then((res) => {
+                console.log(res);
+                if (res.status === 200)
+                    return res.json();
+                else
+                    throw "Api call unsuccessful";
+            })
+            .then((res) => {
+                console.log(res);
+                sessionStorage.setItem("token", res.token);
+                document.location.replace(window.location.pathname.replace("authenticate.html", "voting.html"));
+            })
+            .catch((err) => {
+                // TODO: proper error handling
+                console.log("err: " + err)
+                alert(err);
+                window.location.replace('/');
+            });
+    </script>
+
+</head>
+
+<body>
+    <p>Please wait while we redirect you to the voting page.</p>
+</body>
+
+</html>

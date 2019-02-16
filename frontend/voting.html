@@ -1,0 +1,271 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <title>Prakalpa 2019</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script type="module">
+        import * as config from "./assets/js/config.js";
+        var teamsVoted = {};
+        $(document).ready(function () {
+            console.log(config.getApiPath())
+            if (!sessionStorage.getItem("token")) {
+                window.location.href = "index.html";
+                console.log("Unauthorized");
+            }
+
+            fetch(config.getApiPath() + "/teams")
+                .then(function (res) {
+                    // console.log(res);
+                    return res.json();
+                })
+                .then(function (res) {
+                    // console.log(res);
+                    var teams = res;
+                    for (var team of teams) {
+                        if (!team.isVerified)
+                            continue;
+                        var team_id = team.id;
+                        var span = $("<span></span>", { class: "image" });
+                        // || "images/pic01.jpg"
+                        // var img = $("<img></img>", { class: "image", src: team.photoUrl || "images/pic01.jpg", height: "358", width: "576", alt: "Image for" + team.name });
+                        // span.append(img);
+                        var h2 = $("<h2></h2>", { id: team_id, name: team.name }).text(team.name);
+                        var team_description = team.description.split(",\\n");
+                        var p = $("<p></p>").text(team_description[0]);
+                        var p1 = $("<p></p>").text(team_description[1].replace(",", " ").replace(/(^,)|(,$)/g, "").replace(/(^,)|(,$)/g, "").replace(/(^,)|(,$)/g, "").replace(/,/g, ", "));
+                        var li = $("<li></li>");
+                        var button = $("<button></button>", { class: "button alt", id: team_id, onClick: "registerVote(this.id)" }).text("Vote");
+                        li.append(button);
+                        var ul = $("<ul></ul>", { class: "actions" }).append(li);
+                        var div2 = $("<div></div>", { class: "content" }).append(h2).append(p).append(p1).append(ul);
+                        var article = "";
+                        // if (team.photoUrl)
+                        //     article = $("<article></article>", { class: "feature left" }).append(span).append(div2);
+                        // else
+                        article = $("<article></article>", { class: "feature left" }).append(div2);
+                        $("#teams").append(article);
+                    }
+
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+        });
+
+        function submit() {
+            if (!config.isAppLive()) {
+                swal({
+                    title: "Oh no!",
+                    text: "Voting has ended.",
+                    icon: "error",
+                });
+            }
+            else {
+                if (localStorage.getItem("count") < 3) {
+                    toastr["error"]("Vote for at least three teams");
+                    return;
+                }
+                toastr["success"]("Submitting response...");
+                fetch(config.getApiPath() + '/rating?token=' + sessionStorage.getItem("token"), {
+                    method: 'POST',
+                    mode: "cors",
+                    headers: new Headers(),
+                    body: JSON.stringify(localStorage.getItem("teamsVoted"))
+                })
+                    .then((res) => {
+                        console.log(res);
+                        if (res.status === 200)
+                            return res.json();
+                        else
+                            throw "Api call unsuccessful";
+                    })
+                    .then((res) => {
+                        console.log(res);
+                        // alert(res.message);
+                        $("#submitButton").disabled = "true"
+                        swal({
+                            title: "Great!",
+                            closeOnClickOutside: true,
+                            text: "Your ratings have been recorded!",
+                            icon: "success",
+                        });
+                        // sessionStorage.removeItem("token");
+                        // window.location.href = "index.html";
+                    })
+                    .catch((err) => {
+                        // TODO: proper error handling
+                        console.log("err: " + err)
+                        // swal({
+                        //     title: "Oh no!",
+                        //     text: err,
+                        //     icon: "error",
+                        // });
+                        alert(err);
+                        // window.location.replace('/');
+                    });
+            }
+        }
+
+        document.getElementById("submitButton").addEventListener("click", submit, false);
+        document.getElementById("logout").addEventListener("click", function () {
+            sessionStorage.removeItem("token");
+            window.location.replace('/');
+
+        })
+    </script>
+    <script type="text/javascript">
+        // function animateCss(element, animationName, callback) {
+        //     const node = document.getElementById(element)
+        //     node.classList.add('animated', animationName)
+
+        //     function handleAnimationEnd() {
+        //         node.classList.remove('animated', animationName)
+        //         node.removeEventListener('animationend', handleAnimationEnd)
+
+        //         if (typeof callback === 'function') callback()
+        //     }
+
+        //     node.addEventListener('animationend', handleAnimationEnd)
+        // }
+        var data = [];
+        var count = 0;
+        var teamsVoted = {};
+
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-bottom-full-width",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "2000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+        function registerVote(id) {
+            // console.log(id)
+            if (count == 5 && !teamsVoted[id]) {
+                // alert("5 teams selected");
+                toastr["error"]("5/5 Maximum limit reached")
+            }
+            else {
+
+                teamsVoted[id] = !teamsVoted[id];
+                var voteText = (teamsVoted[id] ? "UN" : "") + "VOTE";
+                var tid = "button#" + id + ".button.alt";
+                $(tid).text(voteText);
+                console.log($("#" + id).text());
+
+                // animateCss(id, "flash");
+                // animateCss("button#" + id, "heartBeat");
+
+                if (teamsVoted[id]) {
+                    count++;
+                }
+                else {
+                    count--;
+                }
+                toastr[teamsVoted[id] ? "success" : "warning"](count + "/5 " + (teamsVoted[id] ? "V" : "Unv") + "oted for " + $("#" + id).text());
+            }
+            // console.log(teamsVoted);
+            localStorage.setItem("count", count);
+            localStorage.setItem("teamsVoted", JSON.stringify(teamsVoted));
+
+        }
+    </script>
+
+
+</head>
+
+<body class="landing">
+
+    <!-- Header -->
+    <header id="header" class="alt">
+        <h1><a href="index.html">Prakalpa 2019</a></h1>
+        <a href="#nav">Menu</a>
+    </header>
+
+    <!-- Nav -->
+    <nav id="nav">
+        <ul class="links">
+            <li><a id="logout" href="index.html">Logout</a></li>
+
+        </ul>
+    </nav>
+
+    <!-- Banner -->
+    <section id="banner">
+        <i class="icon fa-diamond"></i>
+        <h2>Prakalpa Voting Portal</h2><br />
+        <div class="content">
+            <p class="box">Voting Instructions:</p>
+            You are requested to choose a maximum of 5 (minimum of 3) teams that you believe stood out
+            from the rest and deserve to be lauded for their efforts<br />
+            (Scroll down to view the submit button)
+
+        </div>
+    </section>
+
+    <!-- One -->
+    <section id="one" class="wrapper special style3">
+        <div id="teams" class="inner">
+        </div>
+        <ul class="actions">
+            <li><button id="submitButton" class="button big special float">Submit</button></li>
+            <li><a href="#"><button id="topButton" class="button big special">Top</button></a></li>
+        </ul>
+    </section>
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                <span></span>
+                <!-- <li><a href="#" class="icon fa-facebook">
+							<span class="label">Facebook</span>
+						</a></li>
+						<li><a href="#" class="icon fa-twitter">
+							<span class="label">Twitter</span>
+						</a></li>
+						<li><a href="#" class="icon fa-instagram">
+							<span class="label">Instagram</span>
+						</a></li>
+						<li><a href="#" class="icon fa-linkedin">
+							<span class="label">LinkedIn</span>
+						</a></li> -->
+            </ul>
+            <!-- <ul class="copyright">
+						<li>&copy; Untitled.</li>
+						<li>Images: <a href="http://unsplash.com">Unsplash</a>.</li>
+						<li>Design: <a href="http://templated.co">TEMPLATED</a>.</li>
+					</ul> -->
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

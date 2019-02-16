@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+	<title>Prakalpa 2019</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body class="landing">
+
+	<!-- Header -->
+	<header id="header" class="alt">
+		<h1><a href="index.html">Prakalpa 2019</a></h1>
+		<a href="#nav">Menu</a>
+	</header>
+
+	<!-- Nav -->
+	<nav id="nav">
+		<ul class="links">
+			<li><a href="index.html">Home</a></li>
+		</ul>
+	</nav>
+
+	<!-- Banner -->
+	<section id="banner">
+		<i class="icon fa-diamond"></i>
+		<h2>Prakalpa Voting Portal</h2>
+		<p></p>
+		<ul class="actions">
+			<li><button type="button" class="button big special" id="loginButton"></button></li>
+		</ul>
+	</section>
+
+	<!-- Three -->
+	<section id="three" class="wrapper style3 special">
+		<div class="inner">
+			<header class="major narrow	">
+				<h2>Note for students of CS&E department</h2>
+				<div class="content"> Please note that you must visit all stalls at CS&E department (B Block - Ground floor),
+					failing which your votes shall
+					not be taken into consideration and your presence at the event will not be acknowledged.</div>
+			</header>
+
+		</div>
+	</section>
+
+
+	<!-- Footer -->
+	<footer id="footer">
+		<div class="inner">
+			<ul class="icons">
+				<span></span>
+				<!-- <li><a href="#" class="icon fa-facebook">
+					<span class="label">Facebook</span>
+				</a></li>
+				<li><a href="#" class="icon fa-twitter">
+					<span class="label">Twitter</span>
+				</a></li>
+				<li><a href="#" class="icon fa-instagram">
+					<span class="label">Instagram</span>
+				</a></li>
+				<li><a href="#" class="icon fa-linkedin">
+					<span class="label">LinkedIn</span>
+				</a></li> -->
+			</ul>
+			<ul class="copyright">
+				<!-- <li>&copy; Untitled.</li>
+				<li>Images: <a href="http://unsplash.com">Unsplash</a>.</li>
+				<li>Design: <a href="http://templated.co">TEMPLATED</a>.</li> -->
+			</ul>
+		</div>
+	</footer>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/skel.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+	<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+	<script src="assets/js/main.js"></script>
+	<script type="module">
+		import * as config from "./assets/js/config.js";
+		$(document).ready(function () {
+			document.getElementById("loginButton").disabled = false;
+			document.getElementById("loginButton").innerHTML = "Login using PESU Academy";
+
+		});
+		document.getElementById("loginButton").addEventListener("click", redirectToLogin, false);
+
+		function redirectToLogin() {
+			if (!config.isAppLive()) {
+				swal({
+					title: "Oh no!",
+					text: "Voting has ended.",
+					icon: "error",
+				});
+			}
+			else {
+				document.getElementById("loginButton").disabled = true;
+				document.getElementById("loginButton").innerHTML = "Loading, please wait";
+
+				let returnUrl = window.location.href.replace("index.html", "") + "authenticate.html";
+				let ApiPath = config.getApiPath();
+				fetch(ApiPath + '/ssoRedirectUrl' + '?returnUrl=' + returnUrl, { mode: "cors" })
+					.then((res) => {
+						return res.text();
+					})
+					.then((res) => {
+						console.log(res);
+						window.location.href = res;
+					});
+			}
+		}
+
+	</script>
+
+</body>
+
+</html>

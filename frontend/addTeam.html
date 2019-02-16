@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <title>Prakalpa 2019</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <script src="assets/js/jquery.min.js"></script>
+
+    <script type="module">
+        import * as config from "./assets/js/config.js";
+
+
+        function Upload() {
+            var fileUpload = document.getElementById("fileUpload");
+            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+            if (regex.test(fileUpload.value.toLowerCase())) {
+                if (typeof (FileReader) != "undefined") {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        // var table = document.createElement("table");
+                        var rows = e.target.result.split(",^^")
+                        for (var i = 1; i < rows.length; i++) {
+                            var cells = rows[i].split(",##,");
+                            var data = {
+                                name: cells[0] && cells[0].trim(),
+                                description: cells[1] && cells[1].trim() + "", 
+                                photoUrl: (cells[2] && cells[2].trim()) || "",
+                            }
+                            // if (cells.length > 1) {
+                            //     var row = table.insertRow(-1);
+                            //     for (var j = 0; j < cells.length; j++) {
+                            //         var cell = row.insertCell(-1);
+                            //         cell.innerHTML = cells[j];
+                            //     }
+                            // }
+                            console.log(data);
+
+                            fetch(config.getApiPath() + '/newTeam', {
+                                method: 'POST',
+                                mode: "cors",
+                                headers: new Headers(),
+                                body: JSON.stringify(data)
+                            })
+                                .then((res) => {
+                                    console.log(res);
+                                    if (res.status === 200)
+                                        return res.json();
+                                    else
+                                        throw "Api call unsuccessful";
+                                })
+                                .then((res) => {
+                                    console.log(res);
+                                    // alert(res.message);
+                                    // sessionStorage.removeItem("token");
+                                    // window.location.href = "index.html";
+                                })
+                                .catch((err) => {
+                                    alert(err);
+                                })
+                        }
+                        // var dvCSV = document.getElementById("dvCSV");
+                        // dvCSV.innerHTML = "";
+                        // dvCSV.appendChild(table);
+                    }
+                    reader.readAsText(fileUpload.files[0]);
+                } else {
+                    alert("This browser does not support HTML5.");
+                }
+            } else {
+                alert("Please upload a valid CSV file.");
+            }
+        } 
+
+        document.getElementById("upload").addEventListener("click", Upload, false);
+
+    </script>
+</head>
+
+<body class="landing">
+
+    <!-- Header -->
+    <header id="header" class="alt">
+        <h1><a href="index.html">Prakalpa 2019</a></h1>
+        <a href="#nav">Menu</a>
+    </header>
+
+    <!-- Nav -->
+    <nav id="nav">
+        <ul class="links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html">Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- Banner -->
+    <section id="banner">
+        <!-- <i class="icon fa-diamond"></i> -->
+        <h2 style="font-size:50px">Prakapla Voting Portal</h2>
+        <p>Add Teams (upload CSV)</p>
+        <input type="file" id="fileUpload" />
+        <input type="button" id="upload" value="Upload" onclick="Upload()" />
+        <div id="dvCSV">
+        </div>
+    </section>
+
+
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
