@@ -1,6 +1,11 @@
 # prakalpa-voting-app
 A simple web app, with the front-end developed using  Pure Vanilla js and back-end using Firebase Cloud Functions, to provide a voting infrastructure for Prakalpa, an annual showcasing of projects in PES University.
 
+## Team Members:
+1.  Aniket Kaulavkar PES1201700095
+2.  Rishi Ravikumar PES1201700754
+3.  Vishnu S Murali PES1201701264
+
 # Running
 
 ## Front-end server
